@@ -101,3 +101,82 @@ def load_default_locations():
                     default_folder_3_label.pack(side=tk.LEFT)
         except json.JSONDecodeError:
             messagebox.showerror("Error", "Failed to load default folder locations. The JSON is corrupted.")
+            # Function to save default folder locations to a file
+def save_default_locations():
+    global default_folder_1, default_folder_2, default_folder_3
+    data = {
+        "default_folder_1": str(default_folder_1) if default_folder_1 else None,
+        "default_folder_2": str(default_folder_2) if default_folder_2 else None,
+        "default_folder_3": str(default_folder_3) if default_folder_3 else None
+    }
+    try:
+        with open(DEFAULT_LOCATIONS_FILE, 'w') as file:
+            json.dump(data, file)
+        messagebox.showinfo("Saved", "Default folder locations have been saved.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to save default locations: {e}")
+
+# Function to move files with the selected extensions
+def move_files_with_extensions(source_folder, extensions):
+    try:
+        if not source_folder or not source_folder.exists():
+            messagebox.showerror("Folder Error", "The selected folder no longer exists.")
+            return
+
+        downloads_folder = Path.home() / "Downloads"
+        files_moved_total = 0
+
+        for ext in extensions:
+            new_folder = downloads_folder / f"moved_files_{ext.strip('.')}"
+            new_folder.mkdir(exist_ok=True)
+
+            files_moved = 0
+            for file in source_folder.glob(f"*.{ext.strip('.')}"):
+                shutil.move(str(file), new_folder)
+                files_moved += 1
+                files_moved_total += 1
+
+        if files_moved_total > 0:
+            messagebox.showinfo("Success", f"Moved {files_moved_total} files with selected extensions to {downloads_folder}")
+        else:
+            messagebox.showinfo("No Files Found", "No files with the selected extensions were found in the selected folder.")
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {e}")
+
+# Function to select a folder
+def select_folder():
+    global selected_folder
+    selected_folder_path = filedialog.askdirectory(title="Select Folder")
+
+    if selected_folder_path:
+        selected_folder = Path(selected_folder_path)
+        folder_label.config(text=f"Current Folder: {selected_folder}")
+    else:
+        messagebox.showwarning("Folder Error", "No folder selected!")
+
+# Functions to select Default Folders
+def select_default_folder_1():
+    global default_folder_1
+    selected_default_folder_path = filedialog.askdirectory(title="Select Default Folder 1")
+    if selected_default_folder_path:
+        default_folder_1 = Path(selected_default_folder_path)
+        default_folder_1_label.config(text=f"Default Folder 1: {default_folder_1}")
+        default_folder_1_label.pack(side=tk.LEFT)
+
+def select_default_folder_2():
+    global default_folder_2
+    selected_default_folder_2_path = filedialog.askdirectory(title="Select Default Folder 2")
+
+    if selected_default_folder_2_path:
+        default_folder_2 = Path(selected_default_folder_2_path)
+        default_folder_2_label.config(text=f"Default Folder 2: {default_folder_2}")
+        default_folder_2_label.pack(side=tk.LEFT)
+
+def select_default_folder_3():
+    global default_folder_3
+    selected_default_folder_3_path = filedialog.askdirectory(title="Select Default Folder 3")
+
+    if selected_default_folder_3_path:
+        default_folder_3 = Path(selected_default_folder_3_path)
+        default_folder_3_label.config(text=f"Default Folder 3: {default_folder_3}")
+        default_folder_3_label.pack(side=tk.LEFT)
